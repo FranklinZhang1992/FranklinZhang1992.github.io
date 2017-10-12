@@ -6,20 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://franklinzhang1992.github.io">
-  <title>How to write a user friendly Crontab like task scheduler with java | Franklin&#39;s Blog</title>
+  <title>Influxdb + collectd to collect physical machine &amp; virtual performance statistics | Franklin&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="In previous version of the task scheduler (described here), you may find that the task is not executed at the time you expect. For example: If you create a task with a cron expression like 0 20 15 */3">
-<meta name="keywords" content="Crontab,java">
+  <meta name="description" content="Reference collectdofficial doc: http://collectd.org/documentation/manpages/collectd.conf.5.shtml influxdbofficial doc: https://docs.influxdata.com/influxdb/v1.2/introduction/installation/ grafanaoffic">
+<meta name="keywords" content="influxDB,collectd,Grafana">
 <meta property="og:type" content="article">
-<meta property="og:title" content="How to write a user friendly Crontab like task scheduler with java">
-<meta property="og:url" content="https://franklinzhang1992.github.io/2017/10/06/write-a-more-user-friendly-task-scheduler-with-java/index.html">
+<meta property="og:title" content="Influxdb + collectd to collect physical machine &amp; virtual performance statistics">
+<meta property="og:url" content="https://franklinzhang1992.github.io/2017/10/12/influxdb-collectd-to-collect-physical-machine-virtual-performance-statistics/index.html">
 <meta property="og:site_name" content="Franklin&#39;s Blog">
-<meta property="og:description" content="In previous version of the task scheduler (described here), you may find that the task is not executed at the time you expect. For example: If you create a task with a cron expression like 0 20 15 */3">
+<meta property="og:description" content="Reference collectdofficial doc: http://collectd.org/documentation/manpages/collectd.conf.5.shtml influxdbofficial doc: https://docs.influxdata.com/influxdb/v1.2/introduction/installation/ grafanaoffic">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-01-08T09:45:04.024Z">
+<meta property="og:updated_time" content="2017-10-12T15:29:13.467Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="How to write a user friendly Crontab like task scheduler with java">
-<meta name="twitter:description" content="In previous version of the task scheduler (described here), you may find that the task is not executed at the time you expect. For example: If you create a task with a cron expression like 0 20 15 */3">
+<meta name="twitter:title" content="Influxdb + collectd to collect physical machine &amp; virtual performance statistics">
+<meta name="twitter:description" content="Reference collectdofficial doc: http://collectd.org/documentation/manpages/collectd.conf.5.shtml influxdbofficial doc: https://docs.influxdata.com/influxdb/v1.2/introduction/installation/ grafanaoffic">
   
     <link rel="alternative" href="/atom.xml" title="Franklin&#39;s Blog" type="application/atom+xml">
   
@@ -143,106 +143,98 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-write-a-more-user-friendly-task-scheduler-with-java" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-influxdb-collectd-to-collect-physical-machine-virtual-performance-statistics" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      How to write a user friendly Crontab like task scheduler with java
+      Influxdb + collectd to collect physical machine &amp; virtual performance statistics
     </h1>
   
 
         
-        <a href="/2017/10/06/write-a-more-user-friendly-task-scheduler-with-java/" class="archive-article-date">
-  	<time datetime="2017-10-06T09:43:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-10-06</time>
+        <a href="/2017/10/12/influxdb-collectd-to-collect-physical-machine-virtual-performance-statistics/" class="archive-article-date">
+  	<time datetime="2017-10-12T15:17:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-10-12</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>In previous version of the task scheduler (described <a href="https://franklinzhang1992.github.io/2017/10/04/write-task-scheduler-with-java/">here</a>), you may find that the task is not executed at the time you expect. For example: If you create a task with a cron expression like <code>0 20 15 */3 *</code> at <strong>2017-09-15 10:00</strong>. Ideally, you expect it to be executed at today’s 20:00 (<strong>2017-09-15 20:00</strong>). However, the truth is you will find that the next run time calculated by the Crontab algorithm is <strong>2017-10-15 20:00:00</strong>. You may feel strange because current time is 10:00 and there are still 10 hours left before it turns to 20:00, so why not the task will be executed at today’s 20:00 and execute again at 20:00 three months later? Also, there is only one month between September and October, there seems to be no evidence proves that this is a every-3-months task.<br>This scenario is pretty common, especially for those who does not quite understand how Linux Crontab deals with the cron expression. So based on the algorithm described in my previous blog, here I will provide a solution to make the calculated execution time more user friendly.</p>
-<h6 id="Before-we-start-let’s-learn-about-how-Linux-Crontab-deals-with-the-cron-expression-and-determine-the-next-run-time"><a href="#Before-we-start-let’s-learn-about-how-Linux-Crontab-deals-with-the-cron-expression-and-determine-the-next-run-time" class="headerlink" title="Before we start, let’s learn about how Linux Crontab deals with the cron expression and determine the next run time."></a>Before we start, let’s learn about how Linux Crontab deals with the cron expression and determine the next run time.</h6><a id="more"></a>
-<p>Just like what we did in my previous blog, all fields of a cron expression can finally be converted to the form like <code>x-y/z</code> (x is start, y is stop and z is step) and based on the 3 values, we can generate an array which contains all valid values in this field. Let’s use the expression <code>0 20 15 */3 *</code> as an example, for the month field the <code>*/3</code> can be converted to <code>1-31/3</code>, so we can conclude: start is 1, stop is 31 and step is 3. And with this 3 values, we can get an array <code>[1, 4, 7, 10]</code> (Because the first value in a month is 1). Still in this case, as current time is <strong>2017-09-15</strong>, so the nearest month we can get from the array is 10. Now you know why the next run time is October, right? Other fields keep the same logic so I just do not say much about them.</p>
-<h6 id="Do-you-understand-the-Linux-Crontab’s-calculating-next-run-time-logic-If-so-I-am-happy-to-say-that-you-can-go-on-reading-my-blog-Next-I-will-describe-how-I-make-the-scheduler-more-user-friendly"><a href="#Do-you-understand-the-Linux-Crontab’s-calculating-next-run-time-logic-If-so-I-am-happy-to-say-that-you-can-go-on-reading-my-blog-Next-I-will-describe-how-I-make-the-scheduler-more-user-friendly" class="headerlink" title="Do you understand the Linux Crontab’s calculating next run time logic? If so, I am happy to say that you can go on reading my blog. Next, I will describe how I make the scheduler more user friendly."></a>Do you understand the Linux Crontab’s calculating next run time logic? If so, I am happy to say that you can go on reading my blog. Next, I will describe how I make the scheduler more user friendly.</h6><h2 id="Goal"><a href="#Goal" class="headerlink" title="Goal"></a>Goal</h2><ul>
-<li>The next run time should be calculated based on the current time. We still use the expression <code>0 20 15 */3 *</code> as an example, we want to calculated next run time should be as below:<ul>
-<li>If current time is <strong>2017-09-15 10:00</strong> (earlier than 20:00), then the next run time should just be today’s 20:00 (<strong>2017-09-15 20:00</strong>).</li>
-<li>If current time is <strong>2017-09-15 21:00</strong> (later than 20:00), then the next run time should be at 20:00 three months later (<strong>2017-12-15 20:00</strong>).</li>
-</ul>
+        <h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ol>
+<li>collectd<br>official doc: <a href="http://collectd.org/documentation/manpages/collectd.conf.5.shtml" target="_blank" rel="external">http://collectd.org/documentation/manpages/collectd.conf.5.shtml</a></li>
+<li>influxdb<br>official doc: <a href="https://docs.influxdata.com/influxdb/v1.2/introduction/installation/" target="_blank" rel="external">https://docs.influxdata.com/influxdb/v1.2/introduction/installation/</a></li>
+<li>grafana<br>official doc: <a href="http://docs.grafana.org/installation/rpm/" target="_blank" rel="external">http://docs.grafana.org/installation/rpm/</a></li>
+</ol>
+<h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><a id="more"></a>
+<ul>
+<li><p>collectd</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">yum install collectd collectd-virt</div><div class="line">ervice collectd start</div></pre></td></tr></table></figure>
 </li>
-<li>For all every-X-minutes, hours etc. tasks, the interval between each execution times should always be the same. For example, if it is a every 7 months task, in original Linux Crontab, the task will be executed at January, August and next year’s January etc. However, we can see that the interval between August and next year’s January is 5 months, not 7 months. Obviously this will confuse some users. So we need to figure out a solution to let it be executed at next year’s March and then the interval will still be 7 months.</li>
-</ul>
-<h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h2><ul>
-<li>The solution is simple, as you know, our algorithm of calculating next run time is just finding the nearest value from current time in the array list. So the secret of how we can make the scheduler more user friendly is just make the array list be a dynamic list, the each field’s array should be updated when its parent time unit is nudged.<br>For example, if we nudge month field to next month, then the day-of-month field’s array should be updated. We should count from the last valid value in the array list, plus the step, and use the new value as the start value of the new array, the step in the new array is just the same as the old one.</li>
-<li>Below is a demo of how we update the array. We use the expression <code>0 20 15 */7 *</code> as an example (we assume current time is <strong>2017-09-15 16:00</strong>), let’s focus on the month field.<ul>
-<li>As current month is September, and the step is 7, in order to include September into the array, the minimum value in the array should be 2 and the array will be <code>[2, 9]</code>.</li>
-<li>When we calculating the next run time, the nearest month is September, and the nearest date is 15th. As current time <strong>16:00</strong> is earlier than <strong>20:00</strong>, so the first run time should be <strong>2017-09-15 20:00</strong>. Goal 1 is satisfied.</li>
-<li>When we continue to figure out the next run time, here comes the key, if we do not update the array, then the next run time will be in next year’s February, but actually we want it to be executed at next year’s April. So obviously the values in the month field’s array are not accurate if we nudge to the next year.<br>To resolve this, first, we need to pick out the last value in the array (<strong>9</strong>) and plus it with the step (<strong>7</strong>), we can use java class <strong>Calendar</strong> for the time calculation and we will easily get the new value which means next year’s April (Note. in java Calendar, April is represented as 3 but in Crontab, April is represented as 4, so we need to do a conversion). Now let’s use the new value as the first value in the new array and generate a new array with the step field, the new array will be like <code>[4, 11]</code>. With the new array, we can correctly get the next run time <strong>2018-04-15 20:00</strong>. Bingo.</li>
-</ul>
+<li><p>influxdb</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">cat &lt;&lt;EOF | sudo tee /etc/yum.repos.d/influxdb.repo</div><div class="line">[influxdb]</div><div class="line">name = InfluxDB Repository - RHEL \$releasever</div><div class="line">baseurl = https://repos.influxdata.com/rhel/\$releasever/\$basearch/stable</div><div class="line">enabled = 1</div><div class="line">gpgcheck = 1</div><div class="line">gpgkey = https://repos.influxdata.com/influxdb.key</div><div class="line">EOF</div><div class="line">yum install influxdb</div><div class="line">service influxd start</div></pre></td></tr></table></figure>
 </li>
-<li>For other fields, as the logic is just the same, so I don’t say much about them. I just list the rules below (The first column shows which field is nudged, the second field shows which field’s array should be udpated):</li>
+<li><p>grafana</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">yum install https://grafanarel.s3.amazonaws.com/builds/grafana-4.1.2-1486989747.x86_64.rpm</div><div class="line">service grafana-server start</div></pre></td></tr></table></figure>
+</li>
 </ul>
-<table>
-<thead>
-<tr>
-<th>Nudged field</th>
-<th>Updated array</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Year field</td>
-<td>Month field’s array</td>
-</tr>
-<tr>
-<td>Month field</td>
-<td>Day of month field’s array</td>
-</tr>
-<tr>
-<td>Day of month field</td>
-<td>Hour field’s array</td>
-</tr>
-<tr>
-<td>Hour field</td>
-<td>Minute field’s array</td>
-</tr>
-</tbody>
-</table>
-<p>P.S. No array needs to be updated when minute field is nudged. And for day-of-week field, we do not nudge it as it is enough to just nudge the day-of-month field and it equals to nudge the day-of-week field.</p>
+<h2 id="Influxdb-config-etc-influxdb-influxdb-conf"><a href="#Influxdb-config-etc-influxdb-influxdb-conf" class="headerlink" title="Influxdb config (/etc/influxdb/influxdb.conf):"></a>Influxdb config (/etc/influxdb/influxdb.conf):</h2><ul>
+<li><p>Enable admin web:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[admin]</div><div class="line">enabled = true</div></pre></td></tr></table></figure>
+</li>
+<li><p>Enable collect plugin:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[[collectd]]</div><div class="line">  enabled = true</div><div class="line">  bind-address = &quot;:25826&quot; # the bind address</div><div class="line">  database = &quot;collectd&quot; # Name of the database that will be written to</div><div class="line">  batch-size = 5000 # will flush if this many points get buffered</div><div class="line">  batch-pending = 10 # number of batches that may be pending in memory</div><div class="line">  batch-timeout = &quot;10s&quot;</div><div class="line">  read-buffer = 0 # UDP read buffer size, 0 means to use OS default</div><div class="line">  typesdb = &quot;/usr/share/collectd/types.db&quot;</div></pre></td></tr></table></figure>
+</li>
+<li><p>Enable Auth:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[http]</div><div class="line">  auth-enabled = true</div></pre></td></tr></table></figure>
+</li>
+<li><p>Add admin user</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@localhost ~]# influx</div><div class="line">Connected to http://localhost:8086 version 1.2.0</div><div class="line">InfluxDB shell version: 1.2.0</div><div class="line">&gt; CREATE USER &quot;root&quot; WITH PASSWORD &apos;root&apos; WITH ALL PRIVILEGES</div><div class="line">&gt;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="collectd-config-etc-collectd-conf"><a href="#collectd-config-etc-collectd-conf" class="headerlink" title="collectd config (/etc/collectd.conf):"></a>collectd config (/etc/collectd.conf):</h2><ul>
+<li><p>Global setting:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Hostname    &quot;localhost&quot;</div><div class="line">FQDNLookup   false # If Hostname is determined automatically this setting controls whether or not the daemon should try to figure out the &quot;fully qualified domain name&quot;, FQDN.</div><div class="line">Interval     10 # collect performance data everry 10 seconds.</div></pre></td></tr></table></figure>
+</li>
+<li><p>Enable cpu plugin:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">LoadPlugin cpu</div><div class="line">&lt;Plugin cpu&gt;</div><div class="line">  ReportByCpu false</div><div class="line">  ReportByState false</div><div class="line">&lt;/Plugin&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>Enable memory plugin:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">LoadPlugin memory</div><div class="line">&lt;Plugin memory&gt;</div><div class="line">  ValuesAbsolute false</div><div class="line">  ValuesPercentage true</div><div class="line">&lt;/Plugin&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>Enable disk plugin:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">LoadPlugin disk</div></pre></td></tr></table></figure>
+</li>
+<li><p>Enable interface plugin:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">LoadPlugin interface</div></pre></td></tr></table></figure>
+</li>
+<li><p>Enable network plugin:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">LoadPlugin network</div><div class="line">&lt;Plugin network&gt;</div><div class="line">  Server &quot;localhost&quot; &quot;25826&quot;</div><div class="line">&lt;/Plugin&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>Enable virt plugin:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">LoadPlugin virt</div><div class="line">&lt;Plugin virt&gt;</div><div class="line">  Connection &quot;qemu:///system&quot;</div><div class="line">  RefreshInterval  10</div><div class="line">&lt;/Plugin&gt;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="InfluxDB-SQL-example"><a href="#InfluxDB-SQL-example" class="headerlink" title="InfluxDB SQL example:"></a>InfluxDB SQL example:</h2><ol>
+<li>Get VM disk read<br><code>SELECT &quot;value&quot; FROM &quot;virt_read&quot; WHERE &quot;host&quot; = &#39;centos7.0&#39; AND &quot;type&quot; = &#39;disk_octets&#39; AND &quot;type_instance&quot; = &#39;vda&#39;</code></li>
+<li>Get VM disk write<br><code>SELECT &quot;value&quot; FROM &quot;virt_write&quot; WHERE &quot;host&quot; = &#39;centos7.0&#39; AND &quot;type&quot; = &#39;disk_octets&#39; AND &quot;type_instance&quot; = &#39;vda&#39;</code></li>
+<li>Get VM network receive<br><code>SELECT &quot;value&quot; FROM &quot;virt_rx&quot; WHERE &quot;host&quot; = &#39;centos7.0&#39; AND &quot;type&quot; = &#39;if_octets&#39; AND &quot;type_instance&quot; = &#39;vnet0&#39;</code></li>
+<li>Get VM network transfer<br><code>SELECT &quot;value&quot; FROM &quot;virt_tx&quot; WHERE &quot;host&quot; = &#39;centos7.0&#39; AND &quot;type&quot; = &#39;if_octets&#39; AND &quot;type_instance&quot; = &#39;vnet0&#39;</code></li>
+<li>Get VM cpu usage<br><code>SELECT derivative(&quot;value&quot;, 10s)  / 100000000 FROM &quot;virt_value&quot; WHERE &quot;host&quot; = &#39;centos7.0&#39; AND &quot;type&quot; = &#39;virt_vcpu&#39; AND &quot;type_instance&quot; = &#39;0&#39;</code><br>[Description]<br>We cannot get cpu usage from libvirt directly, we can only get the cpuTime, in order to get cpu usage, we can follow the steps below:<br>5.1 cpu_time_diff = cpuTimenow — cpuTimet seconds ago<br>5.2 %CPU = 100 × cpu_time_diff / (t × nr_cores × 109)</li>
+<li>Get PM disk read<br><code>SELECT &quot;value&quot; FROM &quot;disk_read&quot; WHERE &quot;host&quot; = &#39;localhost&#39; AND &quot;instance&quot; = &#39;sda&#39; AND &quot;type&quot; = &#39;disk_octets&#39;</code></li>
+<li>Get PM disk write<br><code>SELECT &quot;value&quot; FROM &quot;disk_write&quot; WHERE &quot;host&quot; = &#39;localhost&#39; AND &quot;instance&quot; = &#39;sda&#39; AND &quot;type&quot; = &#39;disk_octets&#39;</code></li>
+<li>Get PM network receive<br><code>SELECT &quot;value&quot; FROM &quot;interface_rx&quot; WHERE &quot;host&quot; = &#39;localhost&#39; AND &quot;instance&quot; = &#39;eno16777736&#39; AND &quot;type&quot; = &#39;if_octets&#39;</code></li>
+<li>Get PM network transfer<br><code>SELECT &quot;value&quot; FROM &quot;interface_tx&quot; WHERE &quot;host&quot; = &#39;localhost&#39; AND &quot;instance&quot; = &#39;eno16777736&#39; AND &quot;type&quot; = &#39;if_octets&#39;</code></li>
+<li>Get PM cpu usage<br><code>SELECT &quot;value&quot; FROM &quot;cpu_value&quot; WHERE &quot;host&quot; = &#39;localhost&#39; AND &quot;type&quot; = &#39;percent&#39; AND &quot;type_instance&quot; = &#39;active&#39;</code></li>
+<li>Get PM memory usage<br><code>SELECT &quot;value&quot; FROM &quot;memory_value&quot; WHERE &quot;host&quot; = &#39;localhost&#39; AND &quot;type&quot; = &#39;percent&#39; AND &quot;type_instance&quot; = &#39;used&#39;</code></li>
+</ol>
 <hr>
-<h6 id="Still-I-will-show-you-a-demo-to-help-you-understand-it-Click-here-for-the-demo"><a href="#Still-I-will-show-you-a-demo-to-help-you-understand-it-Click-here-for-the-demo" class="headerlink" title="Still, I will show you a demo to help you understand it. Click here for the demo."></a>Still, I will show you a demo to help you understand it. Click <a href="https://github.com/FranklinZhang1992/unity-learning/tree/master/java/TaskSchedulerAdvance" target="_blank" rel="external">here</a> for the demo.</h6><hr>
 <p>转载请注明：<a href="https://franklinzhang1992.github.io/">Franklin的博客</a></p>
 
       
 
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="/assets/blogImg/my_alipay.png">
-                      <span class="reward-type">支付宝</span>
-                    </div>
-                    
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
       
     </div>
     <div class="article-info article-info-index">
@@ -253,11 +245,15 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Crontab</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">influxDB</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">collectd</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Grafana</a>
         		</li>
       		
 		</ul>
@@ -287,18 +283,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2017/10/06/libguestfs/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          libguestfs 使用经验小结
-        
-      </div>
-    </a>
   
-  
-    <a href="/2017/10/05/write-task-scheduler-with-java/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">How to write a Crontab like task scheduler with java</div>
+    <a href="/2017/10/11/fix_encoding_problems_in_ruby/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Fix Encoding Problems in Ruby</div>
       <i class="icon-circle-right"></i>
     </a>
   

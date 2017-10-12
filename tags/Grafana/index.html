@@ -6,20 +6,15 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://franklinzhang1992.github.io">
-  <title>How to write a user friendly Crontab like task scheduler with java | Franklin&#39;s Blog</title>
+  <title>Tag: Grafana | Franklin&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="In previous version of the task scheduler (described here), you may find that the task is not executed at the time you expect. For example: If you create a task with a cron expression like 0 20 15 */3">
-<meta name="keywords" content="Crontab,java">
-<meta property="og:type" content="article">
-<meta property="og:title" content="How to write a user friendly Crontab like task scheduler with java">
-<meta property="og:url" content="https://franklinzhang1992.github.io/2017/10/06/write-a-more-user-friendly-task-scheduler-with-java/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Franklin&#39;s Blog">
+<meta property="og:url" content="https://franklinzhang1992.github.io/tags/Grafana/index.html">
 <meta property="og:site_name" content="Franklin&#39;s Blog">
-<meta property="og:description" content="In previous version of the task scheduler (described here), you may find that the task is not executed at the time you expect. For example: If you create a task with a cron expression like 0 20 15 */3">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-01-08T09:45:04.024Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="How to write a user friendly Crontab like task scheduler with java">
-<meta name="twitter:description" content="In previous version of the task scheduler (described here), you may find that the task is not executed at the time you expect. For example: If you create a task with a cron expression like 0 20 15 */3">
+<meta name="twitter:title" content="Franklin&#39;s Blog">
   
     <link rel="alternative" href="/atom.xml" title="Franklin&#39;s Blog" type="application/atom+xml">
   
@@ -143,127 +138,56 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-write-a-more-user-friendly-task-scheduler-with-java" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      How to write a user friendly Crontab like task scheduler with java
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2017" class="archive-year">2017</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2017/10/12/influxdb-collectd-to-collect-physical-machine-virtual-performance-statistics/" class="archive-article-date">
+  	<time datetime="2017-10-12T15:17:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-10-12</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2017/10/12/influxdb-collectd-to-collect-physical-machine-virtual-performance-statistics/">Influxdb + collectd to collect physical machine &amp; virtual performance statistics</a>
     </h1>
   
 
-        
-        <a href="/2017/10/06/write-a-more-user-friendly-task-scheduler-with-java/" class="archive-article-date">
-  	<time datetime="2017-10-06T09:43:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-10-06</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>In previous version of the task scheduler (described <a href="https://franklinzhang1992.github.io/2017/10/04/write-task-scheduler-with-java/">here</a>), you may find that the task is not executed at the time you expect. For example: If you create a task with a cron expression like <code>0 20 15 */3 *</code> at <strong>2017-09-15 10:00</strong>. Ideally, you expect it to be executed at today’s 20:00 (<strong>2017-09-15 20:00</strong>). However, the truth is you will find that the next run time calculated by the Crontab algorithm is <strong>2017-10-15 20:00:00</strong>. You may feel strange because current time is 10:00 and there are still 10 hours left before it turns to 20:00, so why not the task will be executed at today’s 20:00 and execute again at 20:00 three months later? Also, there is only one month between September and October, there seems to be no evidence proves that this is a every-3-months task.<br>This scenario is pretty common, especially for those who does not quite understand how Linux Crontab deals with the cron expression. So based on the algorithm described in my previous blog, here I will provide a solution to make the calculated execution time more user friendly.</p>
-<h6 id="Before-we-start-let’s-learn-about-how-Linux-Crontab-deals-with-the-cron-expression-and-determine-the-next-run-time"><a href="#Before-we-start-let’s-learn-about-how-Linux-Crontab-deals-with-the-cron-expression-and-determine-the-next-run-time" class="headerlink" title="Before we start, let’s learn about how Linux Crontab deals with the cron expression and determine the next run time."></a>Before we start, let’s learn about how Linux Crontab deals with the cron expression and determine the next run time.</h6><a id="more"></a>
-<p>Just like what we did in my previous blog, all fields of a cron expression can finally be converted to the form like <code>x-y/z</code> (x is start, y is stop and z is step) and based on the 3 values, we can generate an array which contains all valid values in this field. Let’s use the expression <code>0 20 15 */3 *</code> as an example, for the month field the <code>*/3</code> can be converted to <code>1-31/3</code>, so we can conclude: start is 1, stop is 31 and step is 3. And with this 3 values, we can get an array <code>[1, 4, 7, 10]</code> (Because the first value in a month is 1). Still in this case, as current time is <strong>2017-09-15</strong>, so the nearest month we can get from the array is 10. Now you know why the next run time is October, right? Other fields keep the same logic so I just do not say much about them.</p>
-<h6 id="Do-you-understand-the-Linux-Crontab’s-calculating-next-run-time-logic-If-so-I-am-happy-to-say-that-you-can-go-on-reading-my-blog-Next-I-will-describe-how-I-make-the-scheduler-more-user-friendly"><a href="#Do-you-understand-the-Linux-Crontab’s-calculating-next-run-time-logic-If-so-I-am-happy-to-say-that-you-can-go-on-reading-my-blog-Next-I-will-describe-how-I-make-the-scheduler-more-user-friendly" class="headerlink" title="Do you understand the Linux Crontab’s calculating next run time logic? If so, I am happy to say that you can go on reading my blog. Next, I will describe how I make the scheduler more user friendly."></a>Do you understand the Linux Crontab’s calculating next run time logic? If so, I am happy to say that you can go on reading my blog. Next, I will describe how I make the scheduler more user friendly.</h6><h2 id="Goal"><a href="#Goal" class="headerlink" title="Goal"></a>Goal</h2><ul>
-<li>The next run time should be calculated based on the current time. We still use the expression <code>0 20 15 */3 *</code> as an example, we want to calculated next run time should be as below:<ul>
-<li>If current time is <strong>2017-09-15 10:00</strong> (earlier than 20:00), then the next run time should just be today’s 20:00 (<strong>2017-09-15 20:00</strong>).</li>
-<li>If current time is <strong>2017-09-15 21:00</strong> (later than 20:00), then the next run time should be at 20:00 three months later (<strong>2017-12-15 20:00</strong>).</li>
-</ul>
-</li>
-<li>For all every-X-minutes, hours etc. tasks, the interval between each execution times should always be the same. For example, if it is a every 7 months task, in original Linux Crontab, the task will be executed at January, August and next year’s January etc. However, we can see that the interval between August and next year’s January is 5 months, not 7 months. Obviously this will confuse some users. So we need to figure out a solution to let it be executed at next year’s March and then the interval will still be 7 months.</li>
-</ul>
-<h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h2><ul>
-<li>The solution is simple, as you know, our algorithm of calculating next run time is just finding the nearest value from current time in the array list. So the secret of how we can make the scheduler more user friendly is just make the array list be a dynamic list, the each field’s array should be updated when its parent time unit is nudged.<br>For example, if we nudge month field to next month, then the day-of-month field’s array should be updated. We should count from the last valid value in the array list, plus the step, and use the new value as the start value of the new array, the step in the new array is just the same as the old one.</li>
-<li>Below is a demo of how we update the array. We use the expression <code>0 20 15 */7 *</code> as an example (we assume current time is <strong>2017-09-15 16:00</strong>), let’s focus on the month field.<ul>
-<li>As current month is September, and the step is 7, in order to include September into the array, the minimum value in the array should be 2 and the array will be <code>[2, 9]</code>.</li>
-<li>When we calculating the next run time, the nearest month is September, and the nearest date is 15th. As current time <strong>16:00</strong> is earlier than <strong>20:00</strong>, so the first run time should be <strong>2017-09-15 20:00</strong>. Goal 1 is satisfied.</li>
-<li>When we continue to figure out the next run time, here comes the key, if we do not update the array, then the next run time will be in next year’s February, but actually we want it to be executed at next year’s April. So obviously the values in the month field’s array are not accurate if we nudge to the next year.<br>To resolve this, first, we need to pick out the last value in the array (<strong>9</strong>) and plus it with the step (<strong>7</strong>), we can use java class <strong>Calendar</strong> for the time calculation and we will easily get the new value which means next year’s April (Note. in java Calendar, April is represented as 3 but in Crontab, April is represented as 4, so we need to do a conversion). Now let’s use the new value as the first value in the new array and generate a new array with the step field, the new array will be like <code>[4, 11]</code>. With the new array, we can correctly get the next run time <strong>2018-04-15 20:00</strong>. Bingo.</li>
-</ul>
-</li>
-<li>For other fields, as the logic is just the same, so I don’t say much about them. I just list the rules below (The first column shows which field is nudged, the second field shows which field’s array should be udpated):</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>Nudged field</th>
-<th>Updated array</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Year field</td>
-<td>Month field’s array</td>
-</tr>
-<tr>
-<td>Month field</td>
-<td>Day of month field’s array</td>
-</tr>
-<tr>
-<td>Day of month field</td>
-<td>Hour field’s array</td>
-</tr>
-<tr>
-<td>Hour field</td>
-<td>Minute field’s array</td>
-</tr>
-</tbody>
-</table>
-<p>P.S. No array needs to be updated when minute field is nudged. And for day-of-week field, we do not nudge it as it is enough to just nudge the day-of-month field and it equals to nudge the day-of-week field.</p>
-<hr>
-<h6 id="Still-I-will-show-you-a-demo-to-help-you-understand-it-Click-here-for-the-demo"><a href="#Still-I-will-show-you-a-demo-to-help-you-understand-it-Click-here-for-the-demo" class="headerlink" title="Still, I will show you a demo to help you understand it. Click here for the demo."></a>Still, I will show you a demo to help you understand it. Click <a href="https://github.com/FranklinZhang1992/unity-learning/tree/master/java/TaskSchedulerAdvance" target="_blank" rel="external">here</a> for the demo.</h6><hr>
-<p>转载请注明：<a href="https://franklinzhang1992.github.io/">Franklin的博客</a></p>
-
-      
-
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="/assets/blogImg/my_alipay.png">
-                      <span class="reward-type">支付宝</span>
-                    </div>
-                    
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Crontab</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">influxDB</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">collectd</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Grafana</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -276,62 +200,17 @@
 	</div>
 
 
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
+        </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2017/10/06/libguestfs/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          libguestfs 使用经验小结
-        
-      </div>
-    </a>
   
   
-    <a href="/2017/10/05/write-task-scheduler-with-java/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">How to write a Crontab like task scheduler with java</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-  
-  
+    </div></section>
   
 
-  
-
-  
-
-  
+    
 
 
           </div>
@@ -354,9 +233,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
+		isPost: false,
 		isArchive: false,
-		isTag: false,
+		isTag: true,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,

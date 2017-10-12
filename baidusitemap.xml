@@ -185,4 +185,28 @@
     </url>
 
     
+    
+  <url>
+    <loc>https://franklinzhang1992.github.io/2017/10/12/influxdb-collectd-to-collect-physical-machine-virtual-performance-statistics/</loc>
+    <lastmod>2017-10-12T15:29:13.467Z</lastmod>
+    <data>
+        <display>
+        <title>Influxdb + collectd to collect physical machine & virtual performance statistics</title>
+        <pubTime>2017-10-12T15:17:58.000Z</pubTime>
+        
+        <tag>influxDB</tag>
+         
+        <tag>collectd</tag>
+         
+        <tag>Grafana</tag>
+         
+         
+           
+             
+              <breadCrumb title="technology" url="https://franklinzhang1992.github.io/categories/technology/"/>
+          
+        </display>
+    </data>
+    </url>
+
 </urlset>
