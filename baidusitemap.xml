@@ -4,8 +4,104 @@
 
     
   <url>
+    <loc>https://franklinzhang1992.github.io/2017/10/11/fix_encoding_problems_in_ruby/</loc>
+    <lastmod>2018-01-11T06:41:00.526Z</lastmod>
+    <data>
+        <display>
+        <title>Fix Encoding Problems in Ruby</title>
+        <pubTime>2017-10-11T02:00:34.000Z</pubTime>
+        
+        <tag>encoding</tag>
+         
+        <tag>ruby</tag>
+         
+         
+           
+             
+              <breadCrumb title="technology" url="https://franklinzhang1992.github.io/categories/technology/"/>
+          
+             
+              <breadCrumb title="转载" url="https://franklinzhang1992.github.io/categories/technology/%E8%BD%AC%E8%BD%BD/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://franklinzhang1992.github.io/2017/10/06/libguestfs/</loc>
+    <lastmod>2018-01-09T08:07:38.761Z</lastmod>
+    <data>
+        <display>
+        <title>libguestfs 使用经验小结</title>
+        <pubTime>2017-10-06T13:49:34.000Z</pubTime>
+        
+        <tag>libguestfs</tag>
+         
+        <tag>opensource</tag>
+         
+        <tag>P2V</tag>
+         
+        <tag>V2V</tag>
+         
+         
+           
+             
+              <breadCrumb title="technology" url="https://franklinzhang1992.github.io/categories/technology/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://franklinzhang1992.github.io/2017/10/04/github-markdown-guide/</loc>
+    <lastmod>2018-01-08T09:45:04.024Z</lastmod>
+    <data>
+        <display>
+        <title>GitHub Markdown Guide</title>
+        <pubTime>2017-10-04T11:40:15.000Z</pubTime>
+        
+        <tag>github</tag>
+         
+        <tag>Markdown</tag>
+         
+         
+           
+             
+              <breadCrumb title="technology" url="https://franklinzhang1992.github.io/categories/technology/"/>
+          
+             
+              <breadCrumb title="转载" url="https://franklinzhang1992.github.io/categories/technology/%E8%BD%AC%E8%BD%BD/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://franklinzhang1992.github.io/2017/09/10/hello-world/</loc>
+    <lastmod>2018-01-08T09:45:04.024Z</lastmod>
+    <data>
+        <display>
+        <title>Hello World</title>
+        <pubTime>2017-09-10T13:49:34.000Z</pubTime>
+        
+        <tag>hexo</tag>
+         
+         
+           
+             
+              <breadCrumb title="technology" url="https://franklinzhang1992.github.io/categories/technology/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://franklinzhang1992.github.io/2017/09/14/install-markdown-plugin-for-sublime3/</loc>
-    <lastmod>2017-09-14T14:49:31.850Z</lastmod>
+    <lastmod>2018-01-08T09:45:04.024Z</lastmod>
     <data>
         <display>
         <title>Sublime3 安装Markdown插件</title>
@@ -15,23 +111,78 @@
          
          
            
+             
+              <breadCrumb title="technology" url="https://franklinzhang1992.github.io/categories/technology/"/>
+          
         </display>
     </data>
     </url>
 
     
   <url>
-    <loc>https://franklinzhang1992.github.io/2017/09/08/hello-world/</loc>
-    <lastmod>2017-09-08T13:08:51.866Z</lastmod>
+    <loc>https://franklinzhang1992.github.io/2017/10/04/set-open-terminl-shortcut-in-centos-7/</loc>
+    <lastmod>2018-01-08T09:45:04.024Z</lastmod>
     <data>
         <display>
-        <title>Hello World</title>
-        <pubTime>2017-09-08T13:08:51.866Z</pubTime>
+        <title>CentOS 7设置打开终端的快捷键</title>
+        <pubTime>2017-10-04T10:57:21.000Z</pubTime>
         
+        <tag>CentOS 7</tag>
+         
+        <tag>shortcut</tag>
+         
          
            
+             
+              <breadCrumb title="technology" url="https://franklinzhang1992.github.io/categories/technology/"/>
+          
         </display>
     </data>
     </url>
 
+    
+  <url>
+    <loc>https://franklinzhang1992.github.io/2017/10/06/write-a-more-user-friendly-task-scheduler-with-java/</loc>
+    <lastmod>2018-01-08T09:45:04.024Z</lastmod>
+    <data>
+        <display>
+        <title>How to write a user friendly Crontab like task scheduler with java</title>
+        <pubTime>2017-10-06T09:43:39.000Z</pubTime>
+        
+        <tag>Crontab</tag>
+         
+        <tag>java</tag>
+         
+         
+           
+             
+              <breadCrumb title="technology" url="https://franklinzhang1992.github.io/categories/technology/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://franklinzhang1992.github.io/2017/10/05/write-task-scheduler-with-java/</loc>
+    <lastmod>2018-01-08T09:45:04.024Z</lastmod>
+    <data>
+        <display>
+        <title>How to write a Crontab like task scheduler with java</title>
+        <pubTime>2017-10-05T03:30:32.000Z</pubTime>
+        
+        <tag>Crontab</tag>
+         
+        <tag>java</tag>
+         
+         
+           
+             
+              <breadCrumb title="technology" url="https://franklinzhang1992.github.io/categories/technology/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
 </urlset>

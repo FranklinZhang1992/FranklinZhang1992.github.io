@@ -6,15 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://franklinzhang1992.github.io">
-  <title>Tag: Sublime3 | Franklin&#39;s Blog</title>
+  <title>libguestfs 使用经验小结 | Franklin&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Franklin&#39;s Blog">
-<meta property="og:url" content="https://franklinzhang1992.github.io/tags/Sublime3/index.html">
+  <meta name="description" content="概述libguestfs是一组访问或修改虚拟机镜像文件的工具。本文将重点介绍下V2V与P2V两个工具。 介绍 V2V Virt-v2v converts guests from a foreign hypervisor to run on KVM. It can read Linux and Windows guests running on VMware, Xen, Hyper-V and so">
+<meta name="keywords" content="libguestfs,opensource,P2V,V2V">
+<meta property="og:type" content="article">
+<meta property="og:title" content="libguestfs 使用经验小结">
+<meta property="og:url" content="https://franklinzhang1992.github.io/2017/10/06/libguestfs/index.html">
 <meta property="og:site_name" content="Franklin&#39;s Blog">
+<meta property="og:description" content="概述libguestfs是一组访问或修改虚拟机镜像文件的工具。本文将重点介绍下V2V与P2V两个工具。 介绍 V2V Virt-v2v converts guests from a foreign hypervisor to run on KVM. It can read Linux and Windows guests running on VMware, Xen, Hyper-V and so">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-01-09T08:07:38.761Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Franklin&#39;s Blog">
+<meta name="twitter:title" content="libguestfs 使用经验小结">
+<meta name="twitter:description" content="概述libguestfs是一组访问或修改虚拟机镜像文件的工具。本文将重点介绍下V2V与P2V两个工具。 介绍 V2V Virt-v2v converts guests from a foreign hypervisor to run on KVM. It can read Linux and Windows guests running on VMware, Xen, Hyper-V and so">
   
     <link rel="alternative" href="/atom.xml" title="Franklin&#39;s Blog" type="application/atom+xml">
   
@@ -138,48 +143,110 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-libguestfs" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/09/14/install-markdown-plugin-for-sublime3/" class="archive-article-date">
-  	<time datetime="2017-09-14T13:49:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-14</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/14/install-markdown-plugin-for-sublime3/">Sublime3 安装Markdown插件</a>
+    <h1 class="article-title" itemprop="name">
+      libguestfs 使用经验小结
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2017/10/06/libguestfs/" class="archive-article-date">
+  	<time datetime="2017-10-06T13:49:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-10-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>libguestfs是一组访问或修改虚拟机镜像文件的工具。本文将重点介绍下V2V与P2V两个工具。</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><ul>
+<li>V2V<blockquote>
+<p>Virt-v2v converts guests from a foreign hypervisor to run on KVM. It can read Linux and Windows guests running on VMware, Xen, Hyper-V and some other hypervisors, and convert them to KVM managed by libvirt, OpenStack, oVirt, Red Hat Virtualisation (RHV) or several other targets.</p>
+</blockquote>
+</li>
+<li>P2V<blockquote>
+<p>Virt-p2v converts a physical machine to run virtualized on KVM, managed by libvirt, OpenStack, oVirt, Red Hat Virtualisation (RHV), or one of the other targets supported by virt-v2v.</p>
+</blockquote>
+</li>
+</ul>
+<a id="more"></a>
+<h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><ul>
+<li><p>V2V<br>V2V提供了很多不同的输入输出模式，用户通过<code>-i</code>与<code>-o</code>参数指定了输入输出模式后，V2V即可以开始正常的进行转换，使用起来十分方便。<a href="http://libguestfs.org/virt-v2v.1.html" target="_blank" rel="external">这里</a>详细介绍了virt-v2v命令的用法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">                         ┌────────────┐  ┌─────────&gt; -o null</div><div class="line">-i disk ────────────┐    │            │ ─┘┌────────&gt; -o local</div><div class="line">-i ova  ──────────┐ └──&gt; │ virt-v2v   │ ──┘┌───────&gt; -o qemu</div><div class="line">                  └────&gt; │ conversion │ ───┘┌────────────┐</div><div class="line">VMware─&gt;┌────────────┐   │ server     │ ────&gt; -o libvirt │─&gt; KVM</div><div class="line">Xen ───&gt;│ -i libvirt ──&gt; │            │     │  (default) │</div><div class="line">... ───&gt;│  (default) │   │            │ ──┐ └────────────┘</div><div class="line">        └────────────┘   │            │ ─┐└────────&gt; -o glance</div><div class="line">-i libvirtxml ─────────&gt; │            │ ┐└─────────&gt; -o rhv</div><div class="line">-i vmx ────────────────&gt; │            │ └──────────&gt; -o vdsm</div><div class="line">                         └────────────┘</div></pre></td></tr></table></figure>
+</li>
+<li><p>P2V<br>对于P2V来说，它的功能是将物理机转换为运行在KVM上的虚拟机。正常来说，我们不会直接运行virt-p2v命令，而是用一个包含virt-p2v程序的启动盘来启动物理机。<a href="http://libguestfs.org/virt-p2v-make-kickstart.1.html" target="_blank" rel="external">这里</a>详细介绍了如何制作这个ISO。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">                           ┌────────────┐  ┌─────────&gt; -o null</div><div class="line">                           │            │ ─┘┌────────&gt; -o local</div><div class="line">                           │ virt-v2v   │ ──┘┌───────&gt; -o qemu</div><div class="line">                           │ conversion │ ───┘┌────────────┐</div><div class="line">                           │ server     │ ────&gt; -o libvirt │─&gt; KVM</div><div class="line">┌──────────┐               │            │     │  (default) │</div><div class="line">│ Physical │               │            │ ──┐ └────────────┘</div><div class="line">│ machine  │---(P2V ISO)─&gt; │            │ ─┐└────────&gt; -o glance</div><div class="line">└──────────┘               │            │ ┐└─────────&gt; -o rhv</div><div class="line">                           │            │ └──────────&gt; -o vdsm</div><div class="line">                           └────────────┘</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ul>
+<li>In Fedora or Red Hat Enterprise Linux:<br><code>sudo yum install libguestfs-tools</code></li>
+<li>On Debian/Ubuntu:<br><code>sudo apt-get install libguestfs-tools</code></li>
+</ul>
+<h2 id="源码获取"><a href="#源码获取" class="headerlink" title="源码获取"></a>源码获取</h2><p>libguestfs是一个开源的软件，代码托管在GitHub上。<a href="https://github.com/libguestfs/libguestfs" target="_blank" rel="external">https://github.com/libguestfs/libguestfs</a></p>
+<h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><h4 id="目录结构（为了更加清晰，这里只列举部分目录）"><a href="#目录结构（为了更加清晰，这里只列举部分目录）" class="headerlink" title="目录结构（为了更加清晰，这里只列举部分目录）"></a>目录结构（为了更加清晰，这里只列举部分目录）</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">libguestfs</div><div class="line">    |</div><div class="line">    |-----p2v</div><div class="line">    |      |----main.c</div><div class="line">    |      |----gui.c</div><div class="line">    |      |----conversion.c</div><div class="line">    |      |----...</div><div class="line">    |</div><div class="line">    |-----v2v</div><div class="line">    |      |----cmdline.ml</div><div class="line">    |      |----v2v.ml</div><div class="line">    |      |----convert_linux.ml</div><div class="line">    |      |----convert_windows.ml</div><div class="line">    |      |----input_XXX.ml</div><div class="line">    |      |----output_XXX.ml</div><div class="line">    |      |----...</div><div class="line">    |</div><div class="line">    |-----...</div></pre></td></tr></table></figure>
+<h4 id="下面是对这些文件功能的解读"><a href="#下面是对这些文件功能的解读" class="headerlink" title="下面是对这些文件功能的解读"></a>下面是对这些文件功能的解读</h4><ul>
+<li><strong>main.c</strong><br>P2V客户端(基于GTK)启动文件，包含了一些初始化的内容。</li>
+<li><strong>gui.c</strong><br>P2V客户端页面渲染，已经初始赋值。</li>
+<li><strong>conversion.c</strong><br>将用户在UI界面上选择的信息与物理机基本属性放置于配置文件，并连接V2Vserver进行转换。</li>
+<li><strong>cmdline.ml</strong><br>解析传给virt-v2v命令的参数。</li>
+<li><strong>v2v.ml</strong><br>V2V的主方法。主要做了以下几件事：<ul>
+<li>解析输入内容</li>
+<li>生成空白disk image</li>
+<li>将source OS的内容进行转换并写入之前创建好的空白disk image</li>
+<li>调用目标hypervisor的接口来创建虚拟机</li>
+</ul>
+</li>
+<li><strong>convert_linux.ml</strong><br>转换Linux系统相关的代码，包括修改fstab文件等。</li>
+<li><strong>convert_windows.ml</strong><br>转换Windows系统相关的代码，包括对注册表的修改，virtio驱动的拷贝等。</li>
+<li><strong>input_XXX.ml</strong><br>所有以<em>input_</em>开头的文件，每个分别对应一个<code>-i</code>选项，负责解析输入源。</li>
+<li><strong>output_XXX.ml</strong><br>所有以<em>output_</em>开头的文件，每个分别对应一个<code>-o</code>选项，负责调用目标hypervisor的接口，来进行创建disk image，创建虚拟机等操作。</li>
+</ul>
+<h2 id="常见问题（持续更新）"><a href="#常见问题（持续更新）" class="headerlink" title="常见问题（持续更新）"></a>常见问题（持续更新）</h2><ul>
+<li>有的时候，我们会发现对于Windows的系统的转换，在转换成功的虚拟机中，我们会发现<strong>virtio</strong>驱动并没有成功安装。这是因为libguestfs中的virtio驱动签名是RedHat，而对于Windows来说，RedHat的签名是不受信的，所以无法自动安装。遇到这种情况，一般有两种解决方案：<ul>
+<li>在转换好的虚拟机中，打开设备管理器，选中驱动没有正常安装的设备(如：网卡)，然后手动选择驱动安装即可。（注：在转换的时候，P2V工具已经将相应的virtio驱动拷贝到了虚拟机中）</li>
+<li>在转换之前，先将RedHat证书加入Windows受信列表中，P2V即可在转换后的虚拟机首次启动后自动完成virtio驱动的安装。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p>转载请注明：<a href="https://franklinzhang1992.github.io/">Franklin的博客</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Sublime3</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">libguestfs</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">opensource</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">P2V</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">V2V</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -192,17 +259,62 @@
 	</div>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2017/10/11/fix_encoding_problems_in_ruby/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Fix Encoding Problems in Ruby
+        
+      </div>
+    </a>
   
   
-    </div></section>
+    <a href="/2017/10/06/write-a-more-user-friendly-task-scheduler-with-java/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">How to write a user friendly Crontab like task scheduler with java</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -225,9 +337,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
